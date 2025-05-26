@@ -1,27 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace AVLTree
 {
     public class Node
     {
-        public int Key;
+        public int Data;
         public Node Left;
         public Node Right;
         public int Height;
 
-        public Node(int key)
+        public Node(int data)
         {
-            Key = key;
-            Left = null; // Awalnya tidak memiliki anak kiri
-            Right = null; // Awalnya tidak memiliki anak kanan
-            Height = 1; // Awalnya dianggap tinggi 1 (karena daun)
+            Data = data;
+            Left = null;
+            Right = null;
+            Height = 1;
         }
-
     }
 
     public class AVL
@@ -30,20 +24,20 @@ namespace AVLTree
 
         private int Height(Node node)
         {
-            if (root == null)
+            if (node == null)
             {
-                return 0; // Jika node kosong, tinggi adalah 0
+                return 0;
             }
-            return node.Height; // Mengembalikan tinggi node
+            return node.Height;
         }
 
         private int BalanceFactor(Node node)
         {
             if (node == null)
             {
-                return 0; // Jika node kosong, faktor keseimbangan adalah 0
+                return 0;
             }
-            return Height(node.Left) - Height(node.Right); // Menghitung faktor keseimbangan
+            return Height(node.Left) - Height(node.Right);
         }
 
         private Node RightRotate(Node y)
@@ -82,58 +76,55 @@ namespace AVLTree
             return y; // Kembalikan node baru yang menjadi akar
         }
 
-        public void Insert(int key)
+        private Node BSTInsert(Node root, int Data)
         {
-            root = Insert(root, key); // Memanggil metode Insert untuk menambahkan kunci
-        }
-
-        private Node BSTInsert(Node node, int key)
-        {
-            if (node == null)
+            if (root == null)
             {
-                return new Node(key); // Jika node kosong, buat node baru
+                root = new Node(Data);
+                return root; // Jika node kosong, buat node baru
             }
-            if (key < node.Key)
+            if (Data < root.Data)
             {
-                node.Left = BSTInsert(node.Left, key); // Masukkan ke subtree kiri
+                root.Left = BSTInsert(root.Left, Data); // Masukkan ke subtree kiri
             }
-            else if (key > node.Key)
+            else if (Data > root.Data)
             {
-                node.Right = BSTInsert(node.Right, key); // Masukkan ke subtree kanan
+                root.Right = BSTInsert(root.Right, Data); // Masukkan ke subtree kanan
             }
             else
             {
-                return node; // Kunci sudah ada, tidak perlu memasukkan lagi
+                return root; // Kunci sudah ada, tidak perlu memasukkan lagi
             }
-            return node; // Kembalikan node yang tidak berubah
+
+            return root; // Kembalikan node yang tidak berubah
         }
 
-        private Node Balancing(Node node, int key)
+        private Node Balancing(Node node, int Data)
         {
             // Get BalanceFactor
             int balance = BalanceFactor(node);
 
             // LL
-            if (balance > 1 && key < node.Left.Key)
+            if (balance > 1 && Data < node.Left.Data)
             {
                 return RightRotate(node); // Lakukan rotasi kanan
             }
 
             // RR
-            if (balance < -1 && key > node.Right.Key)
+            if (balance < -1 && Data > node.Right.Data)
             {
                 return LeftRotate(node); // Lakukan rotasi kiri
             }
 
             // LR
-            if (balance > 1 && key > node.Left.Key)
+            if (balance > 1 && Data > node.Left.Data)
             {
                 node.Left = LeftRotate(node.Left); // Lakukan rotasi kiri pada anak kiri
                 return RightRotate(node); // Lakukan rotasi kanan pada node ini
             }
 
             // RL
-            if (balance < -1 && key < node.Right.Key)
+            if (balance < -1 && Data < node.Right.Data)
             {
                 node.Right = RightRotate(node.Right); // Lakukan rotasi kanan pada anak kanan
                 return LeftRotate(node); // Lakukan rotasi kiri pada node ini
@@ -142,16 +133,22 @@ namespace AVLTree
             return node; // Kembalikan node yang tidak berubah
         }
 
-        private Node Insert(Node node, int key)
+        private Node Insert(Node node, int Data)
         {
-            // 1. Lakukan BST insert
-            BSTInsert(node, key);
-
-            // 2. Perbarui tinggi dari ancestor node
+            node = BSTInsert(node, Data);
             node.Height = Math.Max(Height(node.Left), Height(node.Right)) + 1;
 
-            // 3. Balancing
-            return Balancing(node, key);
+            return Balancing(node, Data);
+        }
+
+        public void Insert(int Data)
+        {
+            root = Insert(root, Data);
+        }
+
+        public void InOrder()
+        {
+            InOrder(root);
         }
 
         public void InOrder(Node root)
@@ -159,7 +156,7 @@ namespace AVLTree
             if (root != null)
             {
                 InOrder(root.Left);
-                Console.Write(root.Key + " ");
+                Console.Write(root.Data + " ");
                 InOrder(root.Right);
             }
         }

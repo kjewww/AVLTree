@@ -10,7 +10,15 @@ namespace AVLTree
     {
         public static void Main(string[] args)
         {
+            AVL tree = new AVL();
+            tree.Insert(10);
+            tree.Insert(20);
+            tree.Insert(30);
+            tree.Insert(40);
+            tree.Insert(50);
+            tree.Insert(25);
 
+            tree.InOrder(); // Output harus: 10 20 25 30 40 50
         }
     }
 }
